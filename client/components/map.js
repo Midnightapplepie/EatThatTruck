@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 
 class Map extends Component {
-  // state = { zoom: 10 };
+  
 	render() {
-    console.log("render")
     var mapStyle = {
       height: '300px',
       width: '100%'
@@ -19,18 +18,18 @@ class Map extends Component {
   }
 
   createMap({lat, lng}) {
-    console.log("createmap")
-    console.log(lat,lng);
+    //create google map object
+
     let mapOptions = {
       zoom: this.props.zoom,
-      center: {lat, lng}
+      center: {lat, lng},
+      scrollwheel: false
     }
-    console.log(mapOptions.center)
-    const map = new google.maps.Map(this.refs.mapCanvas, mapOptions)
+    const map = new google.maps.Map(this.refs.mapCanvas, mapOptions);
+    this.map = map;
   }
 
   defaultLatLng(addressString) {
-    console.log("defaultLatLng")
     //use google geocoder to get lat lng of Address String
     this.geocoder = new google.maps.Geocoder;
 
@@ -48,6 +47,13 @@ class Map extends Component {
     });
 
     return p;
+  }
+
+  createMarker({lat, lng}){
+    let marker = new google.maps.Marker({
+      position: {lat, lng},
+      map: this.map
+    })
   }
 
   componentWillMount(){
@@ -73,57 +79,15 @@ class Map extends Component {
             .then((data)=> {
               this.mapCenter = data;
               this.createMap(this.mapCenter);
+              this.createMarker(this.mapCenter);
             });
         }
-    //component have to be mounted before injecting google scripts
-    // this.marker = this.createMarker()
-    // this.infoWindow = this.createInfoWindow()
-
-    // have to define google maps event listeners here too
-    // because we can't add listeners on the map until its created
-    // google.maps.event.addListener(this.map, 'zoom_changed', ()=> this.handleZoomChange())
   }
-
-  // clean up event listeners when component unmounts
-  componentDidUnMount() {
-    google.maps.event.clearListeners(map, 'zoom_changed')
-  }
-
-  // mapCenter() {
-  //   return new google.maps.LatLng(
-  //     this.props.initialCenter.lat,
-  //     this.props.initialCenter.lng
-  //   )
-  // }
-
-  // createMarker() {
-  //   return new google.maps.Marker({
-  //     position: this.mapCenter(),
-  //     map: this.map
-  //   })
-	// }
-
-  // createInfoWindow() {
-  //   let contentString = "<div class='InfoWindow'>I'm a Window that contains Info Yay</div>"
-  //   return new google.maps.InfoWindow({
-  //     map: this.map,
-  //     anchor: this.marker,
-  //     content: contentString
-  //   })
-  // }
-
-  // handleZoomChange() {
-  //   this.setState({
-  //     zoom: this.map.getZoom()
-  //   })
-  // }
 }
 
 Map.defaultProps = {
-  zoom : 12,
+  zoom : 13,
   location : "San Francisco",
-  mapCenter : null,
-  mapApi : null
 }
 
 export default Map;
