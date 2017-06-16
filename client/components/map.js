@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 class Map extends Component {
-  
+
 	render() {
     var mapStyle = {
       height: '300px',
@@ -27,6 +27,7 @@ class Map extends Component {
     }
     const map = new google.maps.Map(this.refs.mapCanvas, mapOptions);
     this.map = map;
+    this.createMarker(this.mapCenter);
   }
 
   defaultLatLng(addressString) {
@@ -56,6 +57,23 @@ class Map extends Component {
     })
   }
 
+  locateUser(){
+    navigator.geolocation.getCurrentPosition((pos)=>{
+      //if user approve geolocate
+      const {latitude:lat, longitude:lng} = pos.coords;
+      this.mapCenter = {lat,lng}
+      this.createMap(this.mapCenter)
+    },()=>{
+      console.log("sad")
+      //when user decline geolocate
+      this.defaultLatLng("San Francisco, CA, US")
+        .then((latlng) => {
+          this.mapCenter = latlng;
+          this.createMap(this.mapCenter)
+        })
+    })
+  }
+
   componentWillMount(){
     //injecting googlemap api script
     const script = document.createElement("script");
@@ -74,13 +92,8 @@ class Map extends Component {
           if (!google){
             console.log("googleMapApi injection failed");
           }
-          //set default center to SF
-          this.defaultLatLng("San Francisco, CA, US")
-            .then((data)=> {
-              this.mapCenter = data;
-              this.createMap(this.mapCenter);
-              this.createMarker(this.mapCenter);
-            });
+          //prompt to locate user
+          this.locateUser()
         }
   }
 }
