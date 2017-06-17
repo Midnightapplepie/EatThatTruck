@@ -9,25 +9,10 @@ class Map extends Component {
       width: '100%'
     }
 
-    return <div className="googleMap">
-      <div className='UpdatedText'>
-        <p>Current Zoom: { this.props.zoom }</p>
-      </div>
-      <div className='GMap-canvas' ref="mapCanvas" style={mapStyle}>
-      </div>
-    </div>
-  }
-
-  createMap({lat, lng}) {
-    //create google map object
-    let mapOptions = {
-      zoom: this.props.zoom,
-      center: {lat, lng},
-      scrollwheel: false
-    }
-    const map = new google.maps.Map(this.refs.mapCanvas, mapOptions);
-    this.map = map;
-    this.createMarker(this.props.mapCenter);
+    return(<div className="googleMap">
+            <div className='GMap-canvas' ref="mapCanvas" style={mapStyle}>
+            </div>
+          </div>)
   }
 
   defaultLatLng(addressString) {
@@ -50,6 +35,18 @@ class Map extends Component {
     return p;
   }
 
+  createMap({lat, lng}) {
+    //create google map object
+    let mapOptions = {
+      zoom: this.props.zoom,
+      center: {lat, lng},
+      scrollwheel: false
+    }
+    const map = new google.maps.Map(this.refs.mapCanvas, mapOptions);
+    this.map = map;
+    this.createMarker({lat, lng});
+  }
+
   createMarker({lat, lng}){
     let marker = new google.maps.Marker({
       position: {lat, lng},
@@ -58,26 +55,23 @@ class Map extends Component {
   }
 
   locateUser(){
+    //location already set to be San Francisco and map already generated
+    //so user dont have to provide location to render map
     navigator.geolocation.getCurrentPosition((pos)=>{
       //if user approve geolocate
       const {latitude:lat, longitude:lng} = pos.coords;
-      this.props.mapCenter = {lat,lng}
-      this.createMap(this.props.mapCenter);
-      console.log(this.props)
-    },()=>{
-      //notify user about geolocate being disabled
-      console.log("sad")
-      //when user decline geolocate
-      this.defaultLatLng("San Francisco, CA, US")
-        .then((latlng) => {
-          this.props.mapCenter = latlng;
-          this.createMap(this.props.mapCenter)
-        })
+      this.createMap({lat,lng})
+    });
+  }
+
+  getCurrentPosition(){
+    navigator.geolocation.getCurrentPosition((pos)=>{
+      const {latitude:lat, longitude:lng} = pos.coords;
+      console.log(lat,lng)
     })
   }
 
   componentWillMount(){
-    console.log(this.props)
     //injecting googlemap api script
     const script = document.createElement("script");
     script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDtsebK5eDAtda63jlVcqLMgnMdmBKgbiU";
@@ -90,23 +84,39 @@ class Map extends Component {
   }
 
   componentDidMount() {
+    window.test = this.getCurrentPosition;
     //render map after component mounted
     this.mapApi.onload = () => {
           if (!google){
             console.log("googleMapApi injection failed");
           }
+          //create Map as soon as map component is mounted
+          //getting user location even pre-approved takes seconds
+          //this will create better experience by rendering the map in SF first
+          //then update map when userlocation is avaliable
+          if(this.props.userLocation){
+            this.createMap(this.props.userLocation);
+          }else{
+            this.defaultLatLng(this.props.city)
+              .then((latlng) => {
+                this.createMap(latlng)
+              })
+          }
           //prompt to locate user
+
           this.locateUser()
         }
   }
 }
 
 const mapStateToProps = (state) => {
-  const {zoom, location, mapCenter} = state.mapProps
+  const {zoom, city, userLocation} = state.mapProps;
+  const {foodTrucks} = state;
   return {
     zoom,
-    location,
-    mapCenter
+    city,
+    userLocation,
+    foodTrucks
   }
 }
 

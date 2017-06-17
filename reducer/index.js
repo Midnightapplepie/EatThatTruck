@@ -5,9 +5,15 @@ const initialState = {
   foodTrucks : FoodTrucks,
   mapProps : {
     zoom : 13,
-    location : "San Francisco",
+    city : "San Francisco",
     mapCenter: null
-  }
+  },
+  radius: 2,
+  userLocation: {}
+}
+
+const updateMapProps = (state, actions) => {
+  return Object.assign({}, state, {mapProps: actions.payload});
 }
 
 const Reducers = (state=initialState, actions) => {
@@ -15,6 +21,7 @@ const Reducers = (state=initialState, actions) => {
 
   const reducerMap = {
     //name : function
+    UPDATE_MAPPROPS : updateMapProps
   }
 
   //get function by reducer name
