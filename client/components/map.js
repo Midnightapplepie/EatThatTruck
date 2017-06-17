@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 class Map extends Component {
 
@@ -19,7 +20,6 @@ class Map extends Component {
 
   createMap({lat, lng}) {
     //create google map object
-
     let mapOptions = {
       zoom: this.props.zoom,
       center: {lat, lng},
@@ -27,7 +27,7 @@ class Map extends Component {
     }
     const map = new google.maps.Map(this.refs.mapCanvas, mapOptions);
     this.map = map;
-    this.createMarker(this.mapCenter);
+    this.createMarker(this.props.mapCenter);
   }
 
   defaultLatLng(addressString) {
@@ -61,20 +61,23 @@ class Map extends Component {
     navigator.geolocation.getCurrentPosition((pos)=>{
       //if user approve geolocate
       const {latitude:lat, longitude:lng} = pos.coords;
-      this.mapCenter = {lat,lng}
-      this.createMap(this.mapCenter)
+      this.props.mapCenter = {lat,lng}
+      this.createMap(this.props.mapCenter);
+      console.log(this.props)
     },()=>{
+      //notify user about geolocate being disabled
       console.log("sad")
       //when user decline geolocate
       this.defaultLatLng("San Francisco, CA, US")
         .then((latlng) => {
-          this.mapCenter = latlng;
-          this.createMap(this.mapCenter)
+          this.props.mapCenter = latlng;
+          this.createMap(this.props.mapCenter)
         })
     })
   }
 
   componentWillMount(){
+    console.log(this.props)
     //injecting googlemap api script
     const script = document.createElement("script");
     script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDtsebK5eDAtda63jlVcqLMgnMdmBKgbiU";
@@ -98,9 +101,13 @@ class Map extends Component {
   }
 }
 
-Map.defaultProps = {
-  zoom : 13,
-  location : "San Francisco",
+const mapStateToProps = (state) => {
+  const {zoom, location, mapCenter} = state.mapProps
+  return {
+    zoom,
+    location,
+    mapCenter
+  }
 }
 
-export default Map;
+export default connect(mapStateToProps)(Map);

@@ -1,6 +1,14 @@
 import { combineReducers } from 'redux';
+import FoodTrucks from './foodTrucks'
 
-const initialState = {}
+const initialState = {
+  foodTrucks : FoodTrucks,
+  mapProps : {
+    zoom : 13,
+    location : "San Francisco",
+    mapCenter: null
+  }
+}
 
 const Reducers = (state=initialState, actions) => {
   const {name, payload} = actions;
