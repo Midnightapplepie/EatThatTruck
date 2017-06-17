@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {updateUserLocation} from '../../actions'
+import {updateUserLocation, updateMapProps, updateNearByFoodTrucks} from '../../actions'
 
 class Map extends Component {
 
@@ -64,15 +64,15 @@ class Map extends Component {
       const {latitude:lat, longitude:lng} = pos.coords;
       const latlng = {lat,lng}
       this.props.updateUserLocation(latlng);
-      this.createMap(latlng)
+      this.updateMap(latlng)
     });
   }
 
-  getCurrentPosition(){
-    navigator.geolocation.getCurrentPosition((pos)=>{
-      const {latitude:lat, longitude:lng} = pos.coords;
-      console.log(lat,lng)
-    })
+  updateMap(latlng){
+    const {zoom, city} = this.props
+    this.props.updateMapProps({zoom, city, mapCenter: latlng});
+    this.createMap(latlng);
+    this.props.foodTrucks.getNearByTrucks(latlng);
   }
 
   componentWillMount(){
@@ -103,7 +103,7 @@ class Map extends Component {
           }else{
             this.defaultLatLng(this.props.city)
               .then((latlng) => {
-                this.createMap(latlng)
+                this.updateMap(latlng);
               })
           }
           //prompt to locate user
@@ -114,8 +114,8 @@ class Map extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const {zoom, city, userLocation} = state.mapProps;
-  const {foodTrucks} = state;
+  const {zoom, city, mapCenter} = state.mapProps;
+  const {foodTrucks, userLocation} = state;
   return {
     zoom,
     city,
@@ -126,7 +126,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators({
-    updateUserLocation: updateUserLocation
+    updateUserLocation,
+    updateMapProps,
+    updateNearByFoodTrucks
   }, dispatch)
 }
 
