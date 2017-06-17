@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import {updateUserLocation} from '../../actions'
 
 class Map extends Component {
 
@@ -60,7 +62,9 @@ class Map extends Component {
     navigator.geolocation.getCurrentPosition((pos)=>{
       //if user approve geolocate
       const {latitude:lat, longitude:lng} = pos.coords;
-      this.createMap({lat,lng})
+      const latlng = {lat,lng}
+      this.props.updateUserLocation(latlng);
+      this.createMap(latlng)
     });
   }
 
@@ -120,4 +124,11 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(Map);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({
+    updateUserLocation: updateUserLocation
+  }, dispatch)
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Map);
