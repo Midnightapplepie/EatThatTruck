@@ -72,7 +72,13 @@ class Map extends Component {
     const {zoom, city} = this.props
     this.props.updateMapProps({zoom, city, mapCenter: latlng});
     this.createMap(latlng);
-    this.props.foodTrucks.getNearByTrucks(latlng);
+    // this.props.foodTrucks.getNearByTrucks(latlng).then((nearbyTrucks)=>{
+    //   nearbyTrucks.forEach((truck)=>{
+    //     const {latitude, longitude} = truck;
+    //
+    //     this.createMarker({lat: Number(latitude), lng: Number(longitude)});
+    //   })
+    // });
   }
 
   componentWillMount(){
