@@ -8,7 +8,8 @@ const initialState = {
     city : "San Francisco, CA, US",
     mapCenter: null
   },
-  radius: 2,
+  "radius_filter": 2,
+  "open_now_filter": null,
   userLocation: null
 }
 
@@ -20,13 +21,18 @@ const updateMapProps = (state, actions) => {
   return Object.assign({}, state, actions.payload)
 }
 
+const updateSliderValue = (state, actions) => {
+  return Object.assign({}, state, actions.payload)
+}
+
 const Reducers = (state=initialState, actions) => {
   const {type, payload} = actions;
 
   const reducerMap = {
     //type : function
     UPDATE_USER_LOCATION : updateUserLocation,
-    UPDATE_MAPPROPS : updateMapProps
+    UPDATE_MAPPROPS : updateMapProps,
+    UPDATE_SLIDER_VALUE : updateSliderValue
   }
 
   //get function by reducer name

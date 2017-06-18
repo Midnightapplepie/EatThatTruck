@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {updateUserLocation, updateMapProps, updateNearByFoodTrucks} from '../../actions'
+import Slider from './slider.js';
+import LocationSearch from './locationSearch.js';
+import _ from 'lodash';
+import {updateUserLocation, updateMapProps, updateNearByFoodTrucks} from '../../actions';
+// import YelpApi from '../../utils/yelpApi.js'
+//yelp does not allow client side api calls, need to run server with api to make this call
 
 class Map extends Component {
 
@@ -10,11 +16,43 @@ class Map extends Component {
       height: '300px',
       width: '100%'
     }
+    const radiusBtnSetting ={
+      id : "radius_filter",
+      buttonDesc : "All Locations",
+      sliderLabel : "Within Radius",
+      min : 1,
+      max : 20,
+      defaultValue : 2,
+      step : 1
+    }
 
-    return(<div className="googleMap">
-            <div className='GMap-canvas' ref="mapCanvas" style={mapStyle}>
-            </div>
-          </div>)
+    const openNowBtnSetting = {
+      id : "open_now_filter",
+      buttonDesc : "Open Now",
+      sliderLabel : "Time",
+      min : 0,
+      max : 24,
+      defaultValue : new Date().getHours(),
+      step : 1
+    }
+
+    return(
+      <div>
+        <div id="truck-filter" className="">
+          <Slider setting={radiusBtnSetting} />
+          <Slider setting={openNowBtnSetting}/>
+          <LocationSearch />
+        </div>
+        <div className="googleMap">
+          <div className='GMap-canvas' ref="mapCanvas" style={mapStyle}>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  updateTime(e){
+    console.log(e.target.value)
   }
 
   defaultLatLng(addressString) {
@@ -49,11 +87,32 @@ class Map extends Component {
     this.createMarker({lat, lng});
   }
 
-  createMarker({lat, lng}){
+  creatInfoWindow(truck){
+    return (
+      <div>
+        <div>{truck.name}</div>
+        <div>Address: {truck.address}</div>
+        <div>schedule: {truck.scheduleString}</div>
+        <div>{JSON.stringify(truck.dayshours)}</div>
+      </div>
+    )
+  }
+
+  createMarker({lat, lng, truck}){
     let marker = new google.maps.Marker({
       position: {lat, lng},
-      map: this.map
+      map: this.map,
     })
+
+    if(truck){
+      let contentString = ReactDOM.render(this.creatInfoWindow(truck), document.createElement('div'));
+      let infowindow = new google.maps.InfoWindow();
+      infowindow.setContent(contentString)
+
+      marker.addListener('click', function() {
+        infowindow.open(this.map, marker);
+      });
+    }
   }
 
   locateUser(){
@@ -72,13 +131,13 @@ class Map extends Component {
     const {zoom, city} = this.props
     this.props.updateMapProps({zoom, city, mapCenter: latlng});
     this.createMap(latlng);
-    // this.props.foodTrucks.getNearByTrucks(latlng).then((nearbyTrucks)=>{
-    //   nearbyTrucks.forEach((truck)=>{
-    //     const {latitude, longitude} = truck;
-    //
-    //     this.createMarker({lat: Number(latitude), lng: Number(longitude)});
-    //   })
-    // });
+    this.props.foodTrucks.getNearByTrucks(latlng).then((nearbyTrucks)=>{
+      nearbyTrucks.forEach((truck)=>{
+        const {latitude, longitude} = truck;
+
+        this.createMarker({lat: Number(latitude), lng: Number(longitude), truck: truck});
+      })
+    });
   }
 
   componentWillMount(){
@@ -113,8 +172,6 @@ class Map extends Component {
               })
           }
           //prompt to locate user
-
-          this.locateUser()
         }
   }
 }

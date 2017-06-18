@@ -11,7 +11,14 @@ export const updateMapProps = (mapProps) => {
   return {
     type: "UPDATE_MAPPROPS",
     payload: {
-      mapProps : mapProps 
+      mapProps : mapProps
     }
+  }
+}
+
+export const updateSliderValue = (filter) => {
+  return {
+    type: "UPDATE_SLIDER_VALUE",
+    payload: filter
   }
 }
