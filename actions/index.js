@@ -22,3 +22,10 @@ export const updateSliderSetting = (setting) => {
     payload: setting
   }
 }
+
+export const updateSearchValue = (val) => {
+  return {
+    type: "UPDATE_SEARCH_VALUE",
+    payload: val
+  }
+}

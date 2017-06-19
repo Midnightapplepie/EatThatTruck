@@ -9,7 +9,7 @@ const defaultState = {
   "radius_filter": null,
   "open_now_filter": null,
   userLocation: null,
-  searchValue: null
+  searchValue: ""
 }
 
 let initialState  = localStorage.getItem("FoodTruckReduxStore");
@@ -23,17 +23,17 @@ try {
 
 
 
-const updateUserLocation = (state, actions) => {
+const updateUserLocationReducer = (state, actions) => {
   const newState = Object.assign({}, state, actions.payload)
   console.log(newState)
   return newState
 }
 
-const updateMapProps = (state, actions) => {
+const updateMapPropsReducer = (state, actions) => {
   return Object.assign({}, state, actions.payload)
 }
 
-const updateSliderSetting = (state, actions) => {
+const updateSliderSettingReducer = (state, actions) => {
   let setting = actions.payload;
   if (setting.id === "radius_filter" && setting.buttonToggled){
       setting.value = setting.max;
@@ -45,14 +45,19 @@ const updateSliderSetting = (state, actions) => {
   return Object.assign({}, state, {[setting.id] : setting})
 }
 
+const updateSearchValueReducer = (state, actions) => {
+  return Object.assign({}, state, actions.payload)
+}
+
 const Reducers = (state=initialState, actions) => {
   const {type, payload} = actions;
 
   const reducerMap = {
     //type : function
-    UPDATE_USER_LOCATION : updateUserLocation,
-    UPDATE_MAPPROPS : updateMapProps,
-    UPDATE_SLIDER_SETTING : updateSliderSetting
+    UPDATE_USER_LOCATION : updateUserLocationReducer,
+    UPDATE_MAPPROPS : updateMapPropsReducer,
+    UPDATE_SLIDER_SETTING : updateSliderSettingReducer,
+    UPDATE_SEARCH_VALUE : updateSearchValueReducer
   }
 
   //get function by reducer name

@@ -3,14 +3,27 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Slider from './slider.js';
-import LocationSearch from './locationSearch.js';
 import _ from 'lodash';
 import FoodTrucks from '../../utils/foodTrucks.js'
-import {updateUserLocation, updateMapProps, updateNearByFoodTrucks } from '../../actions';
+import {updateUserLocation, updateMapProps, updateNearByFoodTrucks, updateSearchValue} from '../../actions';
+
+require('../stylesheets/components/locationSearch.scss')
 // import YelpApi from '../../utils/yelpApi.js'
 //yelp does not allow client side api calls, need to run server with api to make this call
 
 class Map extends Component {
+
+  handleMapUpdate(){
+    const searchValue = this.props.searchValue.trim();
+    const userLocation = this.props.userLocation;
+
+    if (searchValue != ""){
+      console.log(`searching ${searchValue}`)
+      this.getLatLng(searchValue).then((latlng) => {
+        this.updateMap(latlng)
+      })
+    }
+  }
 
 	render() {
     var mapStyle = {
@@ -41,6 +54,8 @@ class Map extends Component {
       step : 1
     }
 
+    const searchValue = this.props.searchValue;
+
     return(
       <div>
         <div id="truck-filter" className="">
@@ -52,11 +67,14 @@ class Map extends Component {
                     use my location
             </button>
             <div className="input-wrapper">
-              <input type="text" id="location-input" />
+              <input type="text" id="location-input"
+                     onChange = {(e) => this.updateSearchValue(e)}
+                     value = {searchValue}
+              />
               <label htmlFor="location-input">Enter Location Here</label>
             </div>
             <button className="right-button"
-                    onClick={()=>this.updateMap()}
+                    onClick={()=> this.handleMapUpdate()}
                     >
                     Update Map
             </button>
@@ -70,23 +88,24 @@ class Map extends Component {
     )
   }
 
-  updateTime(e){
-    console.log(e.target.value)
+  updateSearchValue(e){
+    const val = e.target.value;
+    this.props.updateSearchValue({searchValue: val});
   }
 
-  defaultLatLng(addressString) {
+  getLatLng(addressString) {
     //use google geocoder to get lat lng of Address String
     this.geocoder = new google.maps.Geocoder;
 
     const p = new Promise((resolve, reject) => {
-      this.geocoder.geocode({'address': 'San Francisco, CA, US'}, (results, status) => {
+      this.geocoder.geocode({'address': addressString}, (results, status) => {
         if(status == google.maps.GeocoderStatus.OK) {
           const lat = results[0].geometry.location.lat();
           const lng = results[0].geometry.location.lng();
 
           resolve({lat,lng});
         }else{
-          console.log("trouble loading map")
+          alert("unable to get location")
         }
       })
     });
@@ -195,7 +214,7 @@ class Map extends Component {
           if(this.props.userLocation){
             this.updateMap(this.props.userLocation);
           }else{
-            this.defaultLatLng(this.props.city)
+            this.getLatLng(this.props.city)
               .then((latlng) => {
                 this.updateMap(latlng);
               })
@@ -207,13 +226,14 @@ class Map extends Component {
 
 const mapStateToProps = (state) => {
   const {zoom, city, mapCenter} = state.mapProps;
-  const {userLocation, radius_filter, open_now_filter} = state;
+  const {userLocation, radius_filter, open_now_filter, searchValue} = state;
   return {
     zoom,
     city,
     userLocation,
     radius_filter,
-    open_now_filter
+    open_now_filter,
+    searchValue
   }
 }
 
@@ -221,7 +241,8 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators({
     updateUserLocation,
     updateMapProps,
-    updateNearByFoodTrucks
+    updateNearByFoodTrucks,
+    updateSearchValue
   }, dispatch)
 }
 
