@@ -16,9 +16,9 @@ export const updateMapProps = (mapProps) => {
   }
 }
 
-export const updateSliderValue = (filter) => {
+export const updateSliderSetting = (setting) => {
   return {
-    type: "UPDATE_SLIDER_VALUE",
-    payload: filter
+    type: "UPDATE_SLIDER_SETTING",
+    payload: setting
   }
 }

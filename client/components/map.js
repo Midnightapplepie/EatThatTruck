@@ -5,7 +5,8 @@ import { bindActionCreators } from 'redux';
 import Slider from './slider.js';
 import LocationSearch from './locationSearch.js';
 import _ from 'lodash';
-import {updateUserLocation, updateMapProps, updateNearByFoodTrucks} from '../../actions';
+import FoodTrucks from '../../utils/foodTrucks.js'
+import {updateUserLocation, updateMapProps, updateNearByFoodTrucks } from '../../actions';
 // import YelpApi from '../../utils/yelpApi.js'
 //yelp does not allow client side api calls, need to run server with api to make this call
 
@@ -16,23 +17,27 @@ class Map extends Component {
       height: '300px',
       width: '100%'
     }
-    const radiusBtnSetting ={
+    const radiusBtnSetting = {
       id : "radius_filter",
       buttonDesc : "All Locations",
       sliderLabel : "Within Radius",
+      buttonToggled: false,
+      buttonOnclick: null,
       min : 1,
       max : 20,
-      defaultValue : 2,
+      value : 2,
       step : 1
     }
 
     const openNowBtnSetting = {
       id : "open_now_filter",
       buttonDesc : "Open Now",
+      buttonToggled: true,
+      buttonOnclick: null,
       sliderLabel : "Time",
       min : 0,
       max : 24,
-      defaultValue : new Date().getHours(),
+      value : new Date().getHours(),
       step : 1
     }
 
@@ -41,7 +46,21 @@ class Map extends Component {
         <div id="truck-filter" className="">
           <Slider setting={radiusBtnSetting} />
           <Slider setting={openNowBtnSetting}/>
-          <LocationSearch />
+          <div className="location-search">
+            <button className="left-button"
+                    onClick={()=>this.locateUser()}>
+                    use my location
+            </button>
+            <div className="input-wrapper">
+              <input type="text" id="location-input" />
+              <label htmlFor="location-input">Enter Location Here</label>
+            </div>
+            <button className="right-button"
+                    onClick={()=>this.updateMap()}
+                    >
+                    Update Map
+            </button>
+          </div>
         </div>
         <div className="googleMap">
           <div className='GMap-canvas' ref="mapCanvas" style={mapStyle}>
@@ -104,6 +123,10 @@ class Map extends Component {
       map: this.map,
     })
 
+    if(!truck){
+      marker.setIcon('https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png')
+    }
+
     if(truck){
       let contentString = ReactDOM.render(this.creatInfoWindow(truck), document.createElement('div'));
       let infowindow = new google.maps.InfoWindow();
@@ -131,7 +154,13 @@ class Map extends Component {
     const {zoom, city} = this.props
     this.props.updateMapProps({zoom, city, mapCenter: latlng});
     this.createMap(latlng);
-    this.props.foodTrucks.getNearByTrucks(latlng).then((nearbyTrucks)=>{
+
+    const { lat ,lng } = latlng;
+    const radius = this.props.radius_filter.value;
+    const hour = this.props.open_now_filter.value;
+
+
+    FoodTrucks.getNearByTrucks({lat, lng, radius, hour}).then((nearbyTrucks)=>{
       nearbyTrucks.forEach((truck)=>{
         const {latitude, longitude} = truck;
 
@@ -164,7 +193,7 @@ class Map extends Component {
           //this will create better experience by rendering the map in SF first
           //then update map when userlocation is avaliable
           if(this.props.userLocation){
-            this.createMap(this.props.userLocation);
+            this.updateMap(this.props.userLocation);
           }else{
             this.defaultLatLng(this.props.city)
               .then((latlng) => {
@@ -178,12 +207,13 @@ class Map extends Component {
 
 const mapStateToProps = (state) => {
   const {zoom, city, mapCenter} = state.mapProps;
-  const {foodTrucks, userLocation} = state;
+  const {userLocation, radius_filter, open_now_filter} = state;
   return {
     zoom,
     city,
     userLocation,
-    foodTrucks
+    radius_filter,
+    open_now_filter
   }
 }
 

@@ -1,28 +1,48 @@
 import { combineReducers } from 'redux';
-import FoodTrucks from './foodTrucks'
 
-const initialState = {
-  foodTrucks : FoodTrucks,
+const defaultState = {
   mapProps : {
     zoom : 13,
     city : "San Francisco, CA, US",
     mapCenter: null
   },
-  "radius_filter": 2,
+  "radius_filter": null,
   "open_now_filter": null,
-  userLocation: null
+  userLocation: null,
+  searchValue: null
 }
 
+let initialState  = localStorage.getItem("FoodTruckReduxStore");
+try {
+  initialState = JSON.parse(initialState)? JSON.parse(initialState) : defaultState;
+}catch(e){
+  console.log(e, "error")
+  localStorage.removeItem("FoodTruckReduxStore");
+}
+
+
+
+
 const updateUserLocation = (state, actions) => {
-  return Object.assign({}, state, actions.payload)
+  const newState = Object.assign({}, state, actions.payload)
+  console.log(newState)
+  return newState
 }
 
 const updateMapProps = (state, actions) => {
   return Object.assign({}, state, actions.payload)
 }
 
-const updateSliderValue = (state, actions) => {
-  return Object.assign({}, state, actions.payload)
+const updateSliderSetting = (state, actions) => {
+  let setting = actions.payload;
+  if (setting.id === "radius_filter" && setting.buttonToggled){
+      setting.value = setting.max;
+  }
+  if (setting.id === "open_now_filter" && setting.buttonToggled){
+      setting.value = new Date().getHours()
+  }
+
+  return Object.assign({}, state, {[setting.id] : setting})
 }
 
 const Reducers = (state=initialState, actions) => {
@@ -32,14 +52,18 @@ const Reducers = (state=initialState, actions) => {
     //type : function
     UPDATE_USER_LOCATION : updateUserLocation,
     UPDATE_MAPPROPS : updateMapProps,
-    UPDATE_SLIDER_VALUE : updateSliderValue
+    UPDATE_SLIDER_SETTING : updateSliderSetting
   }
 
   //get function by reducer name
   const reducer = reducerMap[type];
-
   //return updated state or unchanged state
-  return reducer? reducer(state, actions) : state
+  const newState = reducer? reducer(state, actions) : state
+  //saving state to localStorage
+  localStorage.setItem("FoodTruckReduxStore", JSON.stringify(newState))
+
+  // console.log(newState);
+  return newState
 }
 
 export default Reducers;
