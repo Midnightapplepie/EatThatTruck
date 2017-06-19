@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start-dev": "webpack-dev-server",
-    "start-sand": "nodemon ./sandbox/index.js"
+    "start-sand": "nodemon ./sandbox/index.js",
+    "build" : "webpack"
   },
   "repository": {
     "type": "git",
