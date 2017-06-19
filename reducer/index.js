@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 
 const defaultState = {
   mapProps : {
-    zoom : 12,
+    zoom : 11,
     city : "San Francisco, CA, US",
     mapCenter: null
   },

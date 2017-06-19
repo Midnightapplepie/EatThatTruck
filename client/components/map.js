@@ -30,14 +30,24 @@ class Map extends Component {
     const searchValue = this.props.searchValue.trim();
     const userLocation = this.props.userLocation;
 
+
+    //if there's value in input, use input
     if (searchValue != ""){
       this.getLatLng(searchValue).then((latlng) => {
         this.updateMap(latlng)
       })
     }
 
+    //if no value in input, use user's current location
     if(userLocation){
       this.updateMap(userLocation)
+    }
+
+    //if both not avaliable, use San Francisco
+    if(searchValue === "" && !userLocation){
+        this.getLatLng(this.props.city).then((latlng) => {
+          this.updateMap(latlng)
+      })
     }
   }
 

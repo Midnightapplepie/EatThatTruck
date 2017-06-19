@@ -14,7 +14,7 @@ $screen-small: 500px;
     font-size: 0.8rem;
 
     @media screen and (max-width: $screen-small){
-      font-size: 0.7rem;
+      font-size: 0.9rem;
     }
   }
 
@@ -50,6 +50,7 @@ $screen-small: 500px;
 
     @media screen and (max-width: $screen-small){
       justify-content: flex-start;
+      align-items: center;
       margin-top: 1rem;
     }
 
@@ -59,8 +60,8 @@ $screen-small: 500px;
       padding: 1em;
     }
 
-    *{
-
+    input{
+      width: 200px;
     }
   }
 }

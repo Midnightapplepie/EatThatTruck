@@ -29627,7 +29627,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 const defaultState = {
   mapProps : {
-    zoom : 12,
+    zoom : 11,
     city : "San Francisco, CA, US",
     mapCenter: null
   },
@@ -30903,14 +30903,23 @@ var Map = function (_Component) {
       var searchValue = this.props.searchValue.trim();
       var userLocation = this.props.userLocation;
 
+      //if there's value in input, use input
       if (searchValue != "") {
         this.getLatLng(searchValue).then(function (latlng) {
           _this2.updateMap(latlng);
         });
       }
 
+      //if no value in input, use user's current location
       if (userLocation) {
         this.updateMap(userLocation);
+      }
+
+      //if both not avaliable, use San Francisco
+      if (searchValue === "" && !userLocation) {
+        this.getLatLng(this.props.city).then(function (latlng) {
+          _this2.updateMap(latlng);
+        });
       }
     }
   }, {
@@ -32383,7 +32392,7 @@ exports = module.exports = __webpack_require__(16)(undefined);
 
 
 // module
-exports.push([module.i, ".slider {\n  display: flex;\n  align-items: center;\n  margin: 1rem 0; }\n  @media screen and (max-width: 500px) {\n    .slider {\n      flex-direction: column;\n      align-items: left; } }\n  .slider * {\n    font-size: 0.8rem; }\n    @media screen and (max-width: 500px) {\n      .slider * {\n        font-size: 0.7rem; } }\n  .slider .left-button {\n    height: 40px;\n    width: 20%;\n    background: #90A4AE;\n    color: white;\n    border: none;\n    border-radius: 5px; }\n    @media screen and (max-width: 500px) {\n      .slider .left-button {\n        width: 35%; } }\n    .slider .left-button.toggled {\n      background: #43A047; }\n    .slider .left-button:focus {\n      outline: 0; }\n  .slider .slider-bar-container {\n    width: 80%;\n    max-width: 500px;\n    position: relative;\n    display: flex;\n    justify-content: flex-end;\n    font-weight: bold;\n    color: #455A64; }\n    @media screen and (max-width: 500px) {\n      .slider .slider-bar-container {\n        justify-content: flex-start;\n        margin-top: 1rem; } }\n    .slider .slider-bar-container p {\n      display: inline-block;\n      margin: 0;\n      padding: 1em; }\n", ""]);
+exports.push([module.i, ".slider {\n  display: flex;\n  align-items: center;\n  margin: 1rem 0; }\n  @media screen and (max-width: 500px) {\n    .slider {\n      flex-direction: column;\n      align-items: left; } }\n  .slider * {\n    font-size: 0.8rem; }\n    @media screen and (max-width: 500px) {\n      .slider * {\n        font-size: 0.9rem; } }\n  .slider .left-button {\n    height: 40px;\n    width: 20%;\n    background: #90A4AE;\n    color: white;\n    border: none;\n    border-radius: 5px; }\n    @media screen and (max-width: 500px) {\n      .slider .left-button {\n        width: 35%; } }\n    .slider .left-button.toggled {\n      background: #43A047; }\n    .slider .left-button:focus {\n      outline: 0; }\n  .slider .slider-bar-container {\n    width: 80%;\n    max-width: 500px;\n    position: relative;\n    display: flex;\n    justify-content: flex-end;\n    font-weight: bold;\n    color: #455A64; }\n    @media screen and (max-width: 500px) {\n      .slider .slider-bar-container {\n        justify-content: flex-start;\n        align-items: center;\n        margin-top: 1rem; } }\n    .slider .slider-bar-container p {\n      display: inline-block;\n      margin: 0;\n      padding: 1em; }\n    .slider .slider-bar-container input {\n      width: 200px; }\n", ""]);
 
 // exports
 
