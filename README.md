@@ -62,7 +62,7 @@ Link to your resume or public profile:
 
 Link to to the hosted application where applicable:
 -----
-- https://midnightapplepie.github.io/publicMedia/
+- https://midnightapplepie.github.io/EatThatTruck/
 - http://www.midnightapplepie.com/
 - http://www.xiaoloong.com/
 - http://midnightapplepie.github.io/projects/canvas.html
