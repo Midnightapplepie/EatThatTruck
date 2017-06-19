@@ -1,0 +1,15 @@
+body{
+  margin: 0
+}
+
+body *{
+  box-sizing: border-box;
+  font-family: Roboto;
+}
+
+.header{
+  display: flex;
+  justify-content: center;
+  background: #009688;
+  color: white;
+}

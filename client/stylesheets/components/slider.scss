@@ -1,23 +1,44 @@
 .slider{
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  margin: 1rem;
+
+  *{
+    font-size: 0.8rem;
+  }
 
   .left-button{
+    height: 40px;
     width: 20%;
-    
+    background: #90A4AE;
+    color: white;
+    border: none;
+    border-radius: 5px;
+
     &.toggled{
-      background: green;
+      background: #43A047;
+    }
+
+    &:focus{
+      outline: 0
     }
   }
 
   .slider-bar-container{
     width: 80%;
+    max-width: 500px;
     position: relative;
     display: flex;
+    justify-content: flex-end;
+
     p{
       display: inline-block;
       margin: 0;
       padding: 1em;
+    }
+
+    *{
+
     }
   }
 }

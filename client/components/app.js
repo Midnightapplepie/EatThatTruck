@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import Map from './map';
+require('../stylesheets/components/app.scss')
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <div>Food Truck</div>
+        <div className="header">
+          <h1>Food Truck</h1>
+        </div>
         <Map />
       </div>
     )

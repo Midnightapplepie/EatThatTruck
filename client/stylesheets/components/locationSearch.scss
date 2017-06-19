@@ -1,16 +1,20 @@
 
 .location-search {
   border-radius: 5px;
-  border: 1px solid black;
+  border: 1px solid #cccccc;
   display: flex;
   align-items: stretch;
+  margin: 1rem;
 
   *{
     border: none;
+    font-size: 0.9rem;
   }
 
   .left-button {
     width: 20%;
+    background: #00B0FF;
+    color: white;
   }
   .input-wrapper{
     width: 60%;
@@ -35,5 +39,7 @@
 
   .right-button {
     width: 20%;
+    background: #00B0FF;
+    color: white;
   }
 }

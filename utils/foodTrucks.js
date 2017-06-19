@@ -121,14 +121,16 @@ class FoodTrucks{
       let openNow = set.times.map((timeBlock) => {
         let startTime = timeBlock[0];
         let endTime = timeBlock[1];
-        let now = hour;
+
         //check if time is open 24 hour
         if(startTime === endTime){
+          console.log("24")
           return true;
         }
         //for cases like now = 1am and endTime = 3am, and startTime = 10pm
         //10 > 1 so general test will fail
-        if(startTime > endTime && endTime > now){
+        if(startTime > endTime && endTime > hour){
+          console.log("am")
           return true
         }
 
@@ -138,8 +140,8 @@ class FoodTrucks{
         if(startTime > endTime){
           endTime += 24
         }
-
-        return today.getHours() > startTime && today.getHours() < endTime
+        console.log(hour)
+        return hour > startTime && hour < endTime
       })
       return openToday && _.includes(openNow, true);
     });
@@ -148,7 +150,6 @@ class FoodTrucks{
   }
 
   getNearByTrucks({lat, lng, radius = 2, hour = new Date().getHours()}){
-    console.log(lat, lng, radius, hour);
     //getData is a promise
     const p = new Promise((resolve, reject) => {
       this.getData.then((data) => {

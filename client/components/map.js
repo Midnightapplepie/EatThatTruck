@@ -8,6 +8,7 @@ import FoodTrucks from '../../utils/foodTrucks.js'
 import {updateUserLocation, updateMapProps, updateNearByFoodTrucks, updateSearchValue} from '../../actions';
 
 require('../stylesheets/components/locationSearch.scss')
+require('../stylesheets/components/map.scss')
 // import YelpApi from '../../utils/yelpApi.js'
 //yelp does not allow client side api calls, need to run server with api to make this call
 
@@ -18,7 +19,6 @@ class Map extends Component {
     const userLocation = this.props.userLocation;
 
     if (searchValue != ""){
-      console.log(`searching ${searchValue}`)
       this.getLatLng(searchValue).then((latlng) => {
         this.updateMap(latlng)
       })
@@ -26,14 +26,11 @@ class Map extends Component {
   }
 
 	render() {
-    var mapStyle = {
-      height: '300px',
-      width: '100%'
-    }
+
     const radiusBtnSetting = {
       id : "radius_filter",
-      buttonDesc : "All Locations",
-      sliderLabel : "Within Radius",
+      buttonDesc : "Max Radius",
+      sliderLabel : "Adjust Radius",
       buttonToggled: false,
       buttonOnclick: null,
       min : 1,
@@ -47,7 +44,7 @@ class Map extends Component {
       buttonDesc : "Open Now",
       buttonToggled: true,
       buttonOnclick: null,
-      sliderLabel : "Time",
+      sliderLabel : "Hour",
       min : 0,
       max : 24,
       value : new Date().getHours(),
@@ -57,8 +54,8 @@ class Map extends Component {
     const searchValue = this.props.searchValue;
 
     return(
-      <div>
-        <div id="truck-filter" className="">
+      <div className="map-container">
+        <div id="truck-filter" className="truck-filter">
           <Slider setting={radiusBtnSetting} />
           <Slider setting={openNowBtnSetting}/>
           <div className="location-search">
@@ -81,7 +78,7 @@ class Map extends Component {
           </div>
         </div>
         <div className="googleMap">
-          <div className='GMap-canvas' ref="mapCanvas" style={mapStyle}>
+          <div className='GMap-canvas' ref="mapCanvas">
           </div>
         </div>
       </div>
@@ -178,7 +175,7 @@ class Map extends Component {
     const radius = this.props.radius_filter.value;
     const hour = this.props.open_now_filter.value;
 
-
+    console.log(lat, lng, radius, hour)
     FoodTrucks.getNearByTrucks({lat, lng, radius, hour}).then((nearbyTrucks)=>{
       nearbyTrucks.forEach((truck)=>{
         const {latitude, longitude} = truck;
