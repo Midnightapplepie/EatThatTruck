@@ -1,0 +1,23 @@
+.slider{
+  display: flex;
+  align-items: stretch;
+
+  .left-button{
+    width: 20%;
+    
+    &.toggled{
+      background: green;
+    }
+  }
+
+  .slider-bar-container{
+    width: 80%;
+    position: relative;
+    display: flex;
+    p{
+      display: inline-block;
+      margin: 0;
+      padding: 1em;
+    }
+  }
+}
