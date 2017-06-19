@@ -1,4 +1,4 @@
-# publicMedia
+# Eat That Truck
 README
 ======
 
