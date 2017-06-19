@@ -1,10 +1,10 @@
-body{
-  margin: 0
-}
-
-body *{
+html *, body *{
   box-sizing: border-box;
   font-family: Roboto;
+}
+
+html, body{
+  margin: 0
 }
 
 .header{

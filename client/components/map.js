@@ -2,10 +2,14 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Slider from './slider.js';
 import _ from 'lodash';
-import FoodTrucks from '../../utils/foodTrucks.js'
+
+import Slider from './slider.js';
+import FoodTruckList from './foodTruckList';
+
 import {updateUserLocation, updateMapProps, updateNearByFoodTrucks, updateSearchValue} from '../../actions';
+
+import FoodTrucks from '../../utils/foodTrucks.js'
 
 require('../stylesheets/components/locationSearch.scss')
 require('../stylesheets/components/map.scss')
@@ -29,8 +33,8 @@ class Map extends Component {
 
     const radiusBtnSetting = {
       id : "radius_filter",
-      buttonDesc : "Max Radius",
-      sliderLabel : "Adjust Radius",
+      buttonDesc : "All Locations",
+      sliderLabel : "Filter by Radius",
       buttonToggled: false,
       buttonOnclick: null,
       min : 1,
@@ -44,7 +48,7 @@ class Map extends Component {
       buttonDesc : "Open Now",
       buttonToggled: true,
       buttonOnclick: null,
-      sliderLabel : "Hour",
+      sliderLabel : "Filter by Business Hour",
       min : 0,
       max : 24,
       value : new Date().getHours(),
@@ -61,14 +65,14 @@ class Map extends Component {
           <div className="location-search">
             <button className="left-button"
                     onClick={()=>this.locateUser()}>
-                    use my location
+                    Use My Location
             </button>
             <div className="input-wrapper">
-              <input type="text" id="location-input"
+              <input type="text" id="location-input" className="location-input"
                      onChange = {(e) => this.updateSearchValue(e)}
                      value = {searchValue}
               />
-              <label htmlFor="location-input">Enter Location Here</label>
+              <label className="location-input-label" htmlFor="location-input">Enter Location Here</label>
             </div>
             <button className="right-button"
                     onClick={()=> this.handleMapUpdate()}
@@ -81,6 +85,7 @@ class Map extends Component {
           <div className='GMap-canvas' ref="mapCanvas">
           </div>
         </div>
+        {/* <FoodTruckList /> */}
       </div>
     )
   }
@@ -175,7 +180,6 @@ class Map extends Component {
     const radius = this.props.radius_filter.value;
     const hour = this.props.open_now_filter.value;
 
-    console.log(lat, lng, radius, hour)
     FoodTrucks.getNearByTrucks({lat, lng, radius, hour}).then((nearbyTrucks)=>{
       nearbyTrucks.forEach((truck)=>{
         const {latitude, longitude} = truck;

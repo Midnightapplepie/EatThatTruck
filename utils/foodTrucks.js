@@ -124,13 +124,11 @@ class FoodTrucks{
 
         //check if time is open 24 hour
         if(startTime === endTime){
-          console.log("24")
           return true;
         }
         //for cases like now = 1am and endTime = 3am, and startTime = 10pm
         //10 > 1 so general test will fail
         if(startTime > endTime && endTime > hour){
-          console.log("am")
           return true
         }
 
@@ -140,7 +138,7 @@ class FoodTrucks{
         if(startTime > endTime){
           endTime += 24
         }
-        console.log(hour)
+
         return hour > startTime && hour < endTime
       })
       return openToday && _.includes(openNow, true);
