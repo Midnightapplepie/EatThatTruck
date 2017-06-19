@@ -1,0 +1,32 @@
+.info-container{
+  width: 200px;
+  position: relative;
+
+  .header{
+    color: #00695C;
+    font-weight: bold;
+    background: white;
+    padding: 8px;
+    border-bottom: #CFD8DC;
+    font-size: 16px;
+  }
+  .details{
+    border-bottom: #CFD8DC;
+    padding: 10px 8px;
+
+    div{
+      display: flex;
+
+      span{
+        display: inline-block;
+      }
+    }
+  }
+  .food-items{
+    padding: 10px 8px;
+  }
+  .bold{
+    font-weight: bold;
+    margin-right: 5px;
+  }
+}

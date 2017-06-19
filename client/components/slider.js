@@ -8,11 +8,23 @@ require('../stylesheets/components/slider.scss')
 class Slider extends Component {
 
   handleSlide(e){
+    console.log(e.target.value)
     const val = Number(e.target.value);
     const id = this.props.setting.id;
     const setting = this.props[id]
     const newSetting = Object.assign({}, setting, {value : val})
     this.props.updateSliderSetting(newSetting);
+  }
+
+  handleSliderClick(e){
+    const id = this.props.setting.id;
+    const setting = this.props[id];
+    const toggled = setting.buttonToggled;
+
+    if(toggled){
+      const newSetting = Object.assign({}, setting, {buttonToggled : !toggled})
+      this.props.updateSliderSetting(newSetting);
+    }
   }
 
   toggleCheck(buttonToggled){
@@ -21,7 +33,7 @@ class Slider extends Component {
 
   handleClick(){
     const id = this.props.setting.id;
-    const setting = this.props[id]
+    const setting = this.props[id];
     const toggled = setting.buttonToggled;
     const newSetting = Object.assign({}, setting, {buttonToggled : !toggled})
     this.props.updateSliderSetting(newSetting);
@@ -58,6 +70,7 @@ class Slider extends Component {
           <input type="range"
               min={min} max={max} defaultValue={value} step={step}
               onChange={(e) => this.handleSlide(e)}
+              onClick={(e) => this.handleSliderClick(e)}
           />
           <p>{value}</p>
         </div>

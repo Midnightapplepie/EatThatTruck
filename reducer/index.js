@@ -2,14 +2,15 @@ import { combineReducers } from 'redux';
 
 const defaultState = {
   mapProps : {
-    zoom : 13,
+    zoom : 12,
     city : "San Francisco, CA, US",
     mapCenter: null
   },
-  "radius_filter": null,
-  "open_now_filter": null,
+  radius_filter: null,
+  open_now_filter: null,
   userLocation: null,
-  searchValue: ""
+  searchValue: "",
+  filteredTrucks: []
 }
 
 let initialState  = localStorage.getItem("FoodTruckReduxStore");
@@ -21,11 +22,12 @@ try {
 }
 
 
-
+const updateFilteredTrucksReducer = (state, actions) => {
+  return Object.assign({}, state, actions.payload)
+}
 
 const updateUserLocationReducer = (state, actions) => {
   const newState = Object.assign({}, state, actions.payload)
-  console.log(newState)
   return newState
 }
 
@@ -57,7 +59,8 @@ const Reducers = (state=initialState, actions) => {
     UPDATE_USER_LOCATION : updateUserLocationReducer,
     UPDATE_MAPPROPS : updateMapPropsReducer,
     UPDATE_SLIDER_SETTING : updateSliderSettingReducer,
-    UPDATE_SEARCH_VALUE : updateSearchValueReducer
+    UPDATE_SEARCH_VALUE : updateSearchValueReducer,
+    UPDATE_FILTERED_TRUCKS: updateFilteredTrucksReducer
   }
 
   //get function by reducer name

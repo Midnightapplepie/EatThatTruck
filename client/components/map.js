@@ -4,10 +4,18 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import _ from 'lodash';
 
-import Slider from './slider.js';
+import Slider from './slider';
 import FoodTruckList from './foodTruckList';
+import LoadingIcon from './loadingIcon';
+import InfoWindow from './infoWindow';
 
-import {updateUserLocation, updateMapProps, updateNearByFoodTrucks, updateSearchValue} from '../../actions';
+import {
+  updateUserLocation,
+  updateMapProps,
+  updateNearByFoodTrucks,
+  updateSearchValue,
+  updateFilteredTrucks
+} from '../../actions';
 
 import FoodTrucks from '../../utils/foodTrucks.js'
 
@@ -27,6 +35,57 @@ class Map extends Component {
         this.updateMap(latlng)
       })
     }
+
+    if(userLocation){
+      this.updateMap(userLocation)
+    }
+  }
+
+  addLoadingIcon(){
+    const div = document.createElement("div");
+    div.id = "loading-icon-container";
+    ReactDOM.render(<LoadingIcon />, div)
+
+    document.body.appendChild(div);
+  }
+
+  componentWillMount(){
+    //injecting googlemap api script
+    const script = document.createElement("script");
+    script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDtsebK5eDAtda63jlVcqLMgnMdmBKgbiU";
+    script.async = true;
+    script.defer = true;
+
+    //assigning script to props for event handling after componentDidMount
+    this.mapApi = script;
+    document.body.appendChild(script);
+  }
+
+  componentDidMount() {
+    window.test = this.getCurrentPosition;
+    //render map after component mounted
+    this.mapApi.onload = () => {
+          if (!google){
+            console.log("googleMapApi injection failed");
+          }
+          //create Map as soon as map component is mounted
+          //getting user location even pre-approved takes seconds
+          //this will create better experience by rendering the map in SF first
+          //then update map when userlocation is avaliable
+          if(this.props.userLocation){
+            this.updateMap(this.props.userLocation);
+          }else{
+            this.getLatLng(this.props.city)
+              .then((latlng) => {
+                this.updateMap(latlng);
+              })
+          }
+          //prompt to locate user
+        }
+  }
+
+  inputCheck(){
+    return this.props.searchValue === ""? "" : "hide-label"
   }
 
 	render() {
@@ -72,7 +131,7 @@ class Map extends Component {
                      onChange = {(e) => this.updateSearchValue(e)}
                      value = {searchValue}
               />
-              <label className="location-input-label" htmlFor="location-input">Enter Location Here</label>
+              <label className={`location-input-label ${this.inputCheck()}`} htmlFor="location-input">Enter Location Here</label>
             </div>
             <button className="right-button"
                     onClick={()=> this.handleMapUpdate()}
@@ -85,7 +144,7 @@ class Map extends Component {
           <div className='GMap-canvas' ref="mapCanvas">
           </div>
         </div>
-        {/* <FoodTruckList /> */}
+        {/* <FoodTruckList trucks={this.props.filteredTrucks}/> */}
       </div>
     )
   }
@@ -127,17 +186,6 @@ class Map extends Component {
     this.createMarker({lat, lng});
   }
 
-  creatInfoWindow(truck){
-    return (
-      <div>
-        <div>{truck.name}</div>
-        <div>Address: {truck.address}</div>
-        <div>schedule: {truck.scheduleString}</div>
-        <div>{JSON.stringify(truck.dayshours)}</div>
-      </div>
-    )
-  }
-
   createMarker({lat, lng, truck}){
     let marker = new google.maps.Marker({
       position: {lat, lng},
@@ -149,7 +197,7 @@ class Map extends Component {
     }
 
     if(truck){
-      let contentString = ReactDOM.render(this.creatInfoWindow(truck), document.createElement('div'));
+      let contentString = ReactDOM.render(InfoWindow(truck), document.createElement('div'));
       let infowindow = new google.maps.InfoWindow();
       infowindow.setContent(contentString)
 
@@ -160,6 +208,8 @@ class Map extends Component {
   }
 
   locateUser(){
+    //add loading icon
+    this.addLoadingIcon();
     //location already set to be San Francisco and map already generated
     //so user dont have to provide location to render map
     navigator.geolocation.getCurrentPosition((pos)=>{
@@ -167,6 +217,10 @@ class Map extends Component {
       const {latitude:lat, longitude:lng} = pos.coords;
       const latlng = {lat,lng}
       this.props.updateUserLocation(latlng);
+
+      //remove loading icon
+      document.getElementById("loading-icon-container").remove();
+
       this.updateMap(latlng)
     });
   }
@@ -181,6 +235,7 @@ class Map extends Component {
     const hour = this.props.open_now_filter.value;
 
     FoodTrucks.getNearByTrucks({lat, lng, radius, hour}).then((nearbyTrucks)=>{
+      // this.props.updateFilteredTrucks({filteredTrucks: nearbyTrucks});
       nearbyTrucks.forEach((truck)=>{
         const {latitude, longitude} = truck;
 
@@ -188,53 +243,26 @@ class Map extends Component {
       })
     });
   }
-
-  componentWillMount(){
-    //injecting googlemap api script
-    const script = document.createElement("script");
-    script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDtsebK5eDAtda63jlVcqLMgnMdmBKgbiU";
-    script.async = true;
-    script.defer = true;
-
-    //assigning script to props for event handling after componentDidMount
-    this.mapApi = script;
-    document.body.appendChild(script);
-  }
-
-  componentDidMount() {
-    window.test = this.getCurrentPosition;
-    //render map after component mounted
-    this.mapApi.onload = () => {
-          if (!google){
-            console.log("googleMapApi injection failed");
-          }
-          //create Map as soon as map component is mounted
-          //getting user location even pre-approved takes seconds
-          //this will create better experience by rendering the map in SF first
-          //then update map when userlocation is avaliable
-          if(this.props.userLocation){
-            this.updateMap(this.props.userLocation);
-          }else{
-            this.getLatLng(this.props.city)
-              .then((latlng) => {
-                this.updateMap(latlng);
-              })
-          }
-          //prompt to locate user
-        }
-  }
 }
 
 const mapStateToProps = (state) => {
   const {zoom, city, mapCenter} = state.mapProps;
-  const {userLocation, radius_filter, open_now_filter, searchValue} = state;
+  const {
+    userLocation,
+    radius_filter,
+    open_now_filter,
+    searchValue,
+    filteredTrucks
+  } = state;
+
   return {
     zoom,
     city,
     userLocation,
     radius_filter,
     open_now_filter,
-    searchValue
+    searchValue,
+    filteredTrucks
   }
 }
 
@@ -243,7 +271,8 @@ const mapDispatchToProps = (dispatch) => {
     updateUserLocation,
     updateMapProps,
     updateNearByFoodTrucks,
-    updateSearchValue
+    updateSearchValue,
+    updateFilteredTrucks
   }, dispatch)
 }
 
