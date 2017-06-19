@@ -8,7 +8,6 @@ require('../stylesheets/components/slider.scss')
 class Slider extends Component {
 
   handleSlide(e){
-    console.log(e.target.value)
     const val = Number(e.target.value);
     const id = this.props.setting.id;
     const setting = this.props[id]

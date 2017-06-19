@@ -31259,7 +31259,6 @@ var Slider = function (_Component) {
   _createClass(Slider, [{
     key: 'handleSlide',
     value: function handleSlide(e) {
-      console.log(e.target.value);
       var val = Number(e.target.value);
       var id = this.props.setting.id;
       var setting = this.props[id];
