@@ -4,7 +4,7 @@ module.exports = {
   entry: './client/index.js',
   output: {
     //production bundle output to ./dist
-    path: path.resolve(__dirname,'dist'),
+    path: path.resolve(__dirname,'docs'),
     publicPath: '/',
     filename: 'bundle.js'
   },
