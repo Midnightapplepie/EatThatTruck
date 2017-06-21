@@ -56,14 +56,14 @@ Reasoning behind your technical choices, including architectural. Trade-offs you
 
 Link to your resume or public profile:
 -----
-resume: http://www.midnightapplepie.com/resume
-github: https://github.com/Midnightapplepie
-hackerrank: https://www.hackerrank.com/midnightapplepie
+- resume: http://www.midnightapplepie.com/resume
+- github: https://github.com/Midnightapplepie
+- hackerrank: https://www.hackerrank.com/midnightapplepie
 
 Link to to the hosted application where applicable:
 -----
-https://midnightapplepie.github.io/publicMedia/
-http://www.midnightapplepie.com/
-http://www.xiaoloong.com/
-http://midnightapplepie.github.io/projects/canvas.html
-http://www.slackershub.club/learn-more (database no longer supported by my host so it's down)
+- https://midnightapplepie.github.io/EatThatTruck/
+- http://www.midnightapplepie.com/
+- http://www.xiaoloong.com/
+- http://midnightapplepie.github.io/projects/canvas.html
+- http://www.slackershub.club/learn-more (database no longer supported by my host so it's down)
