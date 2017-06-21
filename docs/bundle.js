@@ -29638,14 +29638,19 @@ const defaultState = {
   filteredTrucks: []
 }
 
-let initialState  = localStorage.getItem("FoodTruckReduxStore");
+localStorage.removeItem("FoodTruckReduxStore");
+
+let initialState  = sessionStorage.getItem("FoodTruckReduxStore");
 try {
   initialState = JSON.parse(initialState)? JSON.parse(initialState) : defaultState;
 }catch(e){
   console.log(e, "error")
-  localStorage.removeItem("FoodTruckReduxStore");
+  sessionStorage.removeItem("FoodTruckReduxStore");
 }
 
+window.onunload = ()=>{
+  // localStorage.removeItem("FoodTruckReduxStoreV2");
+}
 
 const updateFilteredTrucksReducer = (state, actions) => {
   return Object.assign({}, state, actions.payload)
@@ -29722,7 +29727,7 @@ const Reducers = (state=initialState, actions) => {
   //return updated state or unchanged state
   const newState = reducer? reducer(state, actions) : state
   //saving state to localStorage
-  localStorage.setItem("FoodTruckReduxStore", JSON.stringify(newState))
+  sessionStorage.setItem("FoodTruckReduxStore", JSON.stringify(newState))
 
   // console.log(newState);
   return newState
