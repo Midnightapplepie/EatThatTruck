@@ -105,23 +105,29 @@ class Map extends Component {
       buttonDesc : "All Locations",
       sliderLabel : "Filter by Radius",
       buttonToggled: false,
-      buttonOnclick: null,
+      buttonOnclick: (id) =>{
+        document.querySelector(`#${id} input`).value = 15;
+      },
       min : 1,
-      max : 20,
+      max : 15,
       value : 2,
-      step : 1
+      step : 1,
+      valueDisplayed : ""
     }
 
     const openNowBtnSetting = {
       id : "open_now_filter",
       buttonDesc : "Open Now",
       buttonToggled: true,
-      buttonOnclick: null,
+      buttonOnclick: (id) =>{
+        document.querySelector(`#${id} input`).value = new Date().getHours();
+      },
       sliderLabel : "Filter by Business Hour",
-      min : 0,
+      min : 1,
       max : 24,
       value : new Date().getHours(),
-      step : 1
+      step : 1,
+      valueDisplayed : ""
     }
 
     const searchValue = this.props.searchValue;

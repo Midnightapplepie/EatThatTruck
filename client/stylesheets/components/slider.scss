@@ -57,6 +57,8 @@ $screen-small: 500px;
 
     p{
       display: inline-block;
+      min-width: 80px;
+      text-align: right;
       margin: 0;
       padding: 1em;
     }

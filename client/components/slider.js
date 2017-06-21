@@ -19,11 +19,13 @@ class Slider extends Component {
     const id = this.props.setting.id;
     const setting = this.props[id];
     const toggled = setting.buttonToggled;
+    const val = Number(e.target.value);
+    let newSetting = Object.assign({}, setting, {value : val});
 
     if(toggled){
-      const newSetting = Object.assign({}, setting, {buttonToggled : !toggled})
-      this.props.updateSliderSetting(newSetting);
+      newSetting.buttonToggled = !toggled;
     }
+    this.props.updateSliderSetting(newSetting);
   }
 
   toggleCheck(buttonToggled){
@@ -34,7 +36,9 @@ class Slider extends Component {
     const id = this.props.setting.id;
     const setting = this.props[id];
     const toggled = setting.buttonToggled;
-    const newSetting = Object.assign({}, setting, {buttonToggled : !toggled})
+    const newSetting = Object.assign({}, setting, {buttonToggled : !toggled});
+
+    setting.buttonOnclick(id);
     this.props.updateSliderSetting(newSetting);
   }
 
@@ -55,7 +59,8 @@ class Slider extends Component {
       min,
       max,
       value,
-      step
+      step,
+      valueDisplayed
     } = this.props[id] ? this.props[id] : this.props.setting;
     //if there are exisitng setting in the store, use it, else use this.props.setting
     return (
@@ -71,7 +76,7 @@ class Slider extends Component {
               onChange={(e) => this.handleSlide(e)}
               onClick={(e) => this.handleSliderClick(e)}
           />
-          <p>{value}</p>
+          <p>{valueDisplayed}</p>
         </div>
       </div>
     )

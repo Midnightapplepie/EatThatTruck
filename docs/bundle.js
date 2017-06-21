@@ -29660,13 +29660,42 @@ const updateMapPropsReducer = (state, actions) => {
   return Object.assign({}, state, actions.payload)
 }
 
+const handleDistanceChange = (setting) => {
+  if (setting.id === "radius_filter"){
+      if(setting.buttonToggled){
+        setting.value = setting.max;
+      }
+      setting.valueDisplayed = `${setting.value} (mi)`;
+  }
+  return setting;
+}
+
+const handleTimeChange = (setting) => {
+  if (setting.id === "open_now_filter"){
+      if(setting.buttonToggled){
+        setting.value = new Date().getHours();
+      }
+      if(setting.value === 12){
+        setting.valueDisplayed = `${setting.value} pm`;
+      }else if(setting.value === 24){
+        setting.valueDisplayed = `${setting.value/2} am`;
+      }else if(setting.value/12 > 1){
+        setting.valueDisplayed = `${setting.value%12} pm`;
+      }else{
+        setting.valueDisplayed = `${setting.value} am`;
+      }
+  }
+  return setting
+}
+
 const updateSliderSettingReducer = (state, actions) => {
   let setting = actions.payload;
-  if (setting.id === "radius_filter" && setting.buttonToggled){
-      setting.value = setting.max;
+  console.log(setting);
+  if (setting.id === "radius_filter"){
+    handleDistanceChange(setting);
   }
-  if (setting.id === "open_now_filter" && setting.buttonToggled){
-      setting.value = new Date().getHours()
+  if (setting.id === "open_now_filter"){
+    handleTimeChange(setting);
   }
 
   return Object.assign({}, state, {[setting.id] : setting})
@@ -30984,23 +31013,29 @@ var Map = function (_Component) {
         buttonDesc: "All Locations",
         sliderLabel: "Filter by Radius",
         buttonToggled: false,
-        buttonOnclick: null,
+        buttonOnclick: function buttonOnclick(id) {
+          document.querySelector('#' + id + ' input').value = 15;
+        },
         min: 1,
-        max: 20,
+        max: 15,
         value: 2,
-        step: 1
+        step: 1,
+        valueDisplayed: ""
       };
 
       var openNowBtnSetting = {
         id: "open_now_filter",
         buttonDesc: "Open Now",
         buttonToggled: true,
-        buttonOnclick: null,
+        buttonOnclick: function buttonOnclick(id) {
+          document.querySelector('#' + id + ' input').value = new Date().getHours();
+        },
         sliderLabel: "Filter by Business Hour",
-        min: 0,
+        min: 1,
         max: 24,
         value: new Date().getHours(),
-        step: 1
+        step: 1,
+        valueDisplayed: ""
       };
 
       var searchValue = this.props.searchValue;
@@ -31280,11 +31315,13 @@ var Slider = function (_Component) {
       var id = this.props.setting.id;
       var setting = this.props[id];
       var toggled = setting.buttonToggled;
+      var val = Number(e.target.value);
+      var newSetting = Object.assign({}, setting, { value: val });
 
       if (toggled) {
-        var newSetting = Object.assign({}, setting, { buttonToggled: !toggled });
-        this.props.updateSliderSetting(newSetting);
+        newSetting.buttonToggled = !toggled;
       }
+      this.props.updateSliderSetting(newSetting);
     }
   }, {
     key: 'toggleCheck',
@@ -31298,6 +31335,8 @@ var Slider = function (_Component) {
       var setting = this.props[id];
       var toggled = setting.buttonToggled;
       var newSetting = Object.assign({}, setting, { buttonToggled: !toggled });
+
+      setting.buttonOnclick(id);
       this.props.updateSliderSetting(newSetting);
     }
   }, {
@@ -31323,7 +31362,8 @@ var Slider = function (_Component) {
           min = _ref.min,
           max = _ref.max,
           value = _ref.value,
-          step = _ref.step;
+          step = _ref.step,
+          valueDisplayed = _ref.valueDisplayed;
       //if there are exisitng setting in the store, use it, else use this.props.setting
 
 
@@ -31359,7 +31399,7 @@ var Slider = function (_Component) {
           _react2.default.createElement(
             'p',
             null,
-            value
+            valueDisplayed
           )
         )
       );
@@ -32392,7 +32432,7 @@ exports = module.exports = __webpack_require__(16)(undefined);
 
 
 // module
-exports.push([module.i, ".slider {\n  display: flex;\n  align-items: center;\n  margin: 1rem 0; }\n  @media screen and (max-width: 500px) {\n    .slider {\n      flex-direction: column;\n      align-items: left; } }\n  .slider * {\n    font-size: 0.8rem; }\n    @media screen and (max-width: 500px) {\n      .slider * {\n        font-size: 0.9rem; } }\n  .slider .left-button {\n    height: 40px;\n    width: 20%;\n    background: #90A4AE;\n    color: white;\n    border: none;\n    border-radius: 5px; }\n    @media screen and (max-width: 500px) {\n      .slider .left-button {\n        width: 35%; } }\n    .slider .left-button.toggled {\n      background: #43A047; }\n    .slider .left-button:focus {\n      outline: 0; }\n  .slider .slider-bar-container {\n    width: 80%;\n    max-width: 500px;\n    position: relative;\n    display: flex;\n    justify-content: flex-end;\n    font-weight: bold;\n    color: #455A64; }\n    @media screen and (max-width: 500px) {\n      .slider .slider-bar-container {\n        justify-content: flex-start;\n        align-items: center;\n        margin-top: 1rem;\n        width: 100%; } }\n    .slider .slider-bar-container p {\n      display: inline-block;\n      margin: 0;\n      padding: 1em; }\n    .slider .slider-bar-container input {\n      width: 200px; }\n", ""]);
+exports.push([module.i, ".slider {\n  display: flex;\n  align-items: center;\n  margin: 1rem 0; }\n  @media screen and (max-width: 500px) {\n    .slider {\n      flex-direction: column;\n      align-items: left; } }\n  .slider * {\n    font-size: 0.8rem; }\n    @media screen and (max-width: 500px) {\n      .slider * {\n        font-size: 0.9rem; } }\n  .slider .left-button {\n    height: 40px;\n    width: 20%;\n    background: #90A4AE;\n    color: white;\n    border: none;\n    border-radius: 5px; }\n    @media screen and (max-width: 500px) {\n      .slider .left-button {\n        width: 35%; } }\n    .slider .left-button.toggled {\n      background: #43A047; }\n    .slider .left-button:focus {\n      outline: 0; }\n  .slider .slider-bar-container {\n    width: 80%;\n    max-width: 500px;\n    position: relative;\n    display: flex;\n    justify-content: flex-end;\n    font-weight: bold;\n    color: #455A64; }\n    @media screen and (max-width: 500px) {\n      .slider .slider-bar-container {\n        justify-content: flex-start;\n        align-items: center;\n        margin-top: 1rem;\n        width: 100%; } }\n    .slider .slider-bar-container p {\n      display: inline-block;\n      min-width: 80px;\n      text-align: right;\n      margin: 0;\n      padding: 1em; }\n    .slider .slider-bar-container input {\n      width: 200px; }\n", ""]);
 
 // exports
 

@@ -35,13 +35,42 @@ const updateMapPropsReducer = (state, actions) => {
   return Object.assign({}, state, actions.payload)
 }
 
+const handleDistanceChange = (setting) => {
+  if (setting.id === "radius_filter"){
+      if(setting.buttonToggled){
+        setting.value = setting.max;
+      }
+      setting.valueDisplayed = `${setting.value} (mi)`;
+  }
+  return setting;
+}
+
+const handleTimeChange = (setting) => {
+  if (setting.id === "open_now_filter"){
+      if(setting.buttonToggled){
+        setting.value = new Date().getHours();
+      }
+      if(setting.value === 12){
+        setting.valueDisplayed = `${setting.value} pm`;
+      }else if(setting.value === 24){
+        setting.valueDisplayed = `${setting.value/2} am`;
+      }else if(setting.value/12 > 1){
+        setting.valueDisplayed = `${setting.value%12} pm`;
+      }else{
+        setting.valueDisplayed = `${setting.value} am`;
+      }
+  }
+  return setting
+}
+
 const updateSliderSettingReducer = (state, actions) => {
   let setting = actions.payload;
-  if (setting.id === "radius_filter" && setting.buttonToggled){
-      setting.value = setting.max;
+  console.log(setting);
+  if (setting.id === "radius_filter"){
+    handleDistanceChange(setting);
   }
-  if (setting.id === "open_now_filter" && setting.buttonToggled){
-      setting.value = new Date().getHours()
+  if (setting.id === "open_now_filter"){
+    handleTimeChange(setting);
   }
 
   return Object.assign({}, state, {[setting.id] : setting})
