@@ -8,7 +8,12 @@ const rootPath = path.resolve(__dirname,"..");
 // const oauthSignature = require('oauth-signature');
 const {yelpAuth , sfDataAuth} = require("../credentials");
 
-console.log(yelpAuth,sfDataAuth)
+app.use(function(req, res, next) {
+  // console.log(req)
+  res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 const OAuth = oauth.OAuth;
 
@@ -26,8 +31,8 @@ class YelpApi {
       `${this.baseUrl}search?${querystring.stringify(params)}`,
       this.token, this.tokenSecret,
       (err, data, response) => {
-          const result = JSON.parse(data);
-          console.log(data)
+          // const result = JSON.parse(data);
+          callback(data)
       }
     )
   }
@@ -41,22 +46,22 @@ app.get('/test', (request, response) => {
   yelp.search({term: 'popeyes', location: "san francisco"})
 })
 
-app.get('/', (request, response) => {
-  http.get('https://data.sfgov.org/resource/6a9r-agq8.json?$where=objectid > 0',{
-    params: {
-      "$$app_token" : sfDataAuth.token
-    }
+app.get("/", (request, response) => {
+  response.send("shit")
+})
+
+app.get('/search_yelp', (request, response) => {
+  let name = request.query.name;
+  let p = new Promise((resolve, reject) => {
+    yelp.search({term: name, location: "San Francisco"}, resolve)
   })
-    .then((response) => {
-      let allTrucks = response.data;
-      console.log(allTrucks)
-    })
-    .catch((error) => {
-      console.log(error);
-    })
+  p.then((data)=>{
+    // console.log(data);
+    response.json(data)
+  })
 })
 
 //listen on port 3000
-app.listen(process.env.PORT || 8080, function () {
-  console.log("serving on port 8080");
+app.listen(process.env.PORT || 8000, function () {
+  console.log("serving on port 8000");
 });

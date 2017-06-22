@@ -2,6 +2,7 @@ import http from 'axios';
 import _ from 'lodash';
 import {sfDataAuth} from "../credentials";
 import haversine from 'haversine';
+import YelpApi from './yelpApi';
 
 class FoodTrucks{
   constructor({token}){
@@ -26,8 +27,26 @@ class FoodTrucks{
     return p;
   }
 
+  getDataFromYelp(name_obj){
+    const queryNames = Object.keys(name_obj);
+
+    _.take(queryNames,3).forEach((name) => {
+
+      let promise = YelpApi.search(name);
+      promise.then((response) => {
+        const {data, status} = response
+        console.log(name, JSON.parse(data));
+        name_obj[name].data = JSON.parse(data);
+        name_obj[name].status = status;
+      })
+    });
+
+    return name_obj
+  }
+
   structureDate(dataArray){
-    const trucksData = []
+    const trucksData = [];
+    const yelpQueryNames = {};
     //filterout any trucks that does not have dayshours
     dataArray = dataArray.filter((t) => t.dayshours);
     dataArray.forEach((truck) => {
@@ -42,9 +61,19 @@ class FoodTrucks{
         fooditems
       } = truck;
 
+      //set name to dba
+      let dba = name.toLowerCase().match(/dba\W.+/);
+      if(dba != null){
+        name = dba[0].replace(/dba\W/,"").trim();
+        //example Tres truck
+      }
+      yelpQueryNames[name] = {pending: true};
+
       let dataObject = {name, latitude: Number(latitude), longitude: Number(longitude), address, locationdescription, dayshours: this.parseSchedule(dayshours), fooditems, scheduleString}
       trucksData.push(dataObject);
     });
+
+    window.yelpFoodTrucks = this.getDataFromYelp(yelpQueryNames)
 
     return trucksData;
   }

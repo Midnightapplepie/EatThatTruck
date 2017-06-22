@@ -31,7 +31,6 @@ export const updateSearchValue = (val) => {
 }
 
 export const updateFilteredTrucks = (trucks) => {
-  console.log(trucks)
   return {
     type: "UPDATE_FILTERED_TRUCKS",
     payload: trucks

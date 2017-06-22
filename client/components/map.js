@@ -21,7 +21,7 @@ import FoodTrucks from '../../utils/foodTrucks.js'
 
 require('../stylesheets/components/locationSearch.scss')
 require('../stylesheets/components/map.scss')
-// import YelpApi from '../../utils/yelpApi.js'
+import YelpApi from '../../utils/yelpApi.js'
 //yelp does not allow client side api calls, need to run server with api to make this call
 
 class Map extends Component {
@@ -29,7 +29,6 @@ class Map extends Component {
   handleMapUpdate(){
     const searchValue = this.props.searchValue.trim();
     const userLocation = this.props.userLocation;
-
 
     //if there's value in input, use input
     if (searchValue != ""){
@@ -72,25 +71,26 @@ class Map extends Component {
   }
 
   componentDidMount() {
-    window.test = this.getCurrentPosition;
     //render map after component mounted
     this.mapApi.onload = () => {
           if (!google){
             console.log("googleMapApi injection failed");
-          }
-          //create Map as soon as map component is mounted
-          //getting user location even pre-approved takes seconds
-          //this will create better experience by rendering the map in SF first
-          //then update map when userlocation is avaliable
-          if(this.props.userLocation){
-            this.updateMap(this.props.userLocation);
           }else{
-            this.getLatLng(this.props.city)
+            //create Map as soon as map component is mounted
+            //getting user location even pre-approved takes seconds
+            //this will create better experience by rendering the map in SF first
+            //then update map when userlocation is avaliable
+            if(this.props.userLocation){
+              this.updateMap(this.props.userLocation);
+            }else{
+              console.log(this.props)
+              this.getLatLng(this.props.city)
               .then((latlng) => {
                 this.updateMap(latlng);
               })
+            }
+            //prompt to locate user
           }
-          //prompt to locate user
         }
   }
 
@@ -170,26 +170,6 @@ class Map extends Component {
     this.props.updateSearchValue({searchValue: val});
   }
 
-  getLatLng(addressString) {
-    //use google geocoder to get lat lng of Address String
-    this.geocoder = new google.maps.Geocoder;
-
-    const p = new Promise((resolve, reject) => {
-      this.geocoder.geocode({'address': addressString}, (results, status) => {
-        if(status == google.maps.GeocoderStatus.OK) {
-          const lat = results[0].geometry.location.lat();
-          const lng = results[0].geometry.location.lng();
-
-          resolve({lat,lng});
-        }else{
-          alert("unable to get location")
-        }
-      })
-    });
-
-    return p;
-  }
-
   createMap({lat, lng}) {
     //create google map object
     let mapOptions = {
@@ -223,22 +203,58 @@ class Map extends Component {
     }
   }
 
+  getLatLng(addressString){
+    //use google geocoder to get lat lng of Address String
+    this.geocoder = new google.maps.Geocoder;
+
+    const p = new Promise((resolve, reject) => {
+      this.geocoder.geocode({'address': addressString}, (results, status) => {
+        if(status == google.maps.GeocoderStatus.OK) {
+          const lat = results[0].geometry.location.lat();
+          const lng = results[0].geometry.location.lng();
+
+          resolve({lat,lng});
+        }else{
+          alert("unable to get location")
+        }
+      })
+    });
+
+    return p;
+  }
+
+  acceptedGeoLocate(pos){
+    console.log(this, "approved");
+    //if user approve geolocate
+    const {latitude:lat, longitude:lng} = pos.coords;
+    const latlng = {lat,lng}
+    this.props.updateUserLocation(latlng);
+    //remove loading icon
+    document.getElementById("loading-icon-container").remove();
+
+    this.updateMap(latlng);
+  }
+
+  rejectedGeoLocate(error){
+    //run when user denied geolocate or any error when geoloating
+    this.props.updateUserLocation(null);
+    if(error.code === 1){
+      alert("you have disabled geolocation service from this web site, please enable it in your browser");
+    }
+    //remove loading icon
+    const {city} = this.props;
+    this.getLatLng(city).then((latlng)=>{
+      this.updateMap(latlng)
+    });
+    document.getElementById("loading-icon-container").remove();
+  }
+
   locateUser(){
     //add loading icon
     this.addLoadingIcon();
     //location already set to be San Francisco and map already generated
     //so user dont have to provide location to render map
-    navigator.geolocation.getCurrentPosition((pos)=>{
-      //if user approve geolocate
-      const {latitude:lat, longitude:lng} = pos.coords;
-      const latlng = {lat,lng}
-      this.props.updateUserLocation(latlng);
-
-      //remove loading icon
-      document.getElementById("loading-icon-container").remove();
-
-      this.updateMap(latlng)
-    });
+    navigator.geolocation.getCurrentPosition(this.acceptedGeoLocate.bind(this), this.rejectedGeoLocate.bind(this));
   }
 
   updateMap(latlng){
