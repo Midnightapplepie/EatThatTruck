@@ -66,4 +66,3 @@ Link to to the hosted application where applicable:
 - http://www.midnightapplepie.com/
 - http://www.xiaoloong.com/
 - http://midnightapplepie.github.io/projects/canvas.html
-- http://www.slackershub.club/learn-more (database no longer supported by my host so it's down)
